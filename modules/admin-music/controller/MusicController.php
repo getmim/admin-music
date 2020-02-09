@@ -9,13 +9,12 @@ namespace AdminMusic\Controller;
 
 use LibFormatter\Library\Formatter;
 use LibForm\Library\Form;
+use LibForm\Library\Combiner;
 use LibPagination\Library\Paginator;
 use Music\Model\{
     Music,
     MusicAlbum as MAlbum
 };
-use AdminSiteMeta\Library\Meta;
-use LibChain\Library\Option;
 
 class MusicController extends \Admin\Controller
 {
@@ -43,34 +42,39 @@ class MusicController extends \Admin\Controller
             $music = Music::getOne(['id'=>$id]);
             if(!$music)
                 return $this->show404();
-            Meta::parse($music, 'meta');
             $params = $this->getParams('Edit Music');
         }else{
             $params = $this->getParams('Create New Music');
         }
 
-        $form              = new Form('admin-music.edit');
-        $params['form']    = $form;
-        $params['schemas'] = ['MusicRecording'=>'MusicRecording'];
+        $form           = new Form('admin.music.edit');
+        $params['form'] = $form;
 
-        $lopt = [
-            'album' => [ 'ls_albums', 'self', 'id', 'name' ]
+        $c_opts = [
+            'meta'  => [null, null, 'json'],
+            'album' => [null, null, 'format', 'active', 'name']
         ];
-        Option::fetchOptions('music', $music, $lopt, $params);
 
-        if(!($valid = $form->validate($music)) /* || !$form->csrfTest('noob') */)
+        $combiner = new Combiner($id, $c_opts, 'music');
+        $music    = $combiner->prepare($music);
+
+        $params['opts'] = $combiner->getOptions();
+
+        if(!($valid = $form->validate($music)) || !$form->csrfTest('noob'))
             return $this->resp('music/edit', $params);
 
-        Meta::combine($valid, 'meta');
+        $valid = $combiner->finalize($valid);
 
         if($id){
             if(!Music::set((array)$valid, ['id'=>$id]))
                 deb(Music::lastError());
         }else{
             $valid->user = $this->user->id;
-            if(!Music::create((array)$valid))
+            if(!($id = Music::create((array)$valid)))
                 deb(Music::lastError());
         }
+
+        $combiner->save($id, $this->user->id);
 
         // add the log
         $this->addLog([
@@ -114,7 +118,7 @@ class MusicController extends \Admin\Controller
 
         $params             = $this->getParams('Music');
         $params['musics']   = $musics;
-        $params['form']     = new Form('admin-music.index');
+        $params['form']     = new Form('admin.music.index');
 
         $params['form']->validate( (object)$this->req->get() );
 

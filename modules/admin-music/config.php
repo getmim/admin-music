@@ -2,7 +2,7 @@
 
 return [
     '__name' => 'admin-music',
-    '__version' => '0.0.1',
+    '__version' => '0.0.2',
     '__git' => 'git@github.com:getmim/admin-music.git',
     '__license' => 'MIT',
     '__author' => [
@@ -137,7 +137,7 @@ return [
     ],
     'libForm' => [
         'forms' => [
-            'admin-music.index' => [
+            'admin.music.index' => [
                 'q' => [
                     'label' => 'Search',
                     'type' => 'search',
@@ -151,7 +151,7 @@ return [
                     'rules' => []
                 ]
             ],
-            'admin-music.edit' => [
+            'admin.music.edit' => [
                 '@extends' => ['std-site-meta'],
                 'album' => [
                     'label' => 'Album',
@@ -206,9 +206,14 @@ return [
                     'label' => 'About',
                     'type' => 'summernote',
                     'rules' => []
+                ],
+                'meta-schema' => [
+                    'options' => [
+                        'MusicRecording' => 'MusicRecording'
+                    ]
                 ]
             ],
-            'admin-music-album.index' => [
+            'admin.music-album.index' => [
                 'q' => [
                     'label' => 'Search',
                     'type' => 'search',
@@ -216,7 +221,7 @@ return [
                     'rules' => []
                 ]
             ],
-            'admin-music-album.edit' => [
+            'admin.music-album.edit' => [
                 '@extends' => ['std-site-meta'],
                 'name' => [
                     'label' => 'Name',
@@ -267,6 +272,11 @@ return [
                     'label' => 'Release Date',
                     'type' => 'date',
                     'rules' => []
+                ],
+                'meta-schema' => [
+                    'options' => [
+                        'MusicAlbum'=>'MusicAlbum'
+                    ]
                 ]
             ]
         ]

@@ -9,12 +9,12 @@ namespace AdminMusic\Controller;
 
 use LibFormatter\Library\Formatter;
 use LibForm\Library\Form;
+use LibForm\Library\Combiner;
 use LibPagination\Library\Paginator;
 use Music\Model\{
     Music,
     MusicAlbum as MAlbum
 };
-use AdminSiteMeta\Library\Meta;
 
 class AlbumController extends \Admin\Controller
 {
@@ -42,20 +42,25 @@ class AlbumController extends \Admin\Controller
             $album = MAlbum::getOne(['id'=>$id]);
             if(!$album)
                 return $this->show404();
-            Meta::parse($album, 'meta');
             $params = $this->getParams('Edit Music Album');
         }else{
             $params = $this->getParams('Create New Music Album');
         }
 
-        $form              = new Form('admin-music-album.edit');
+        $form              = new Form('admin.music-album.edit');
         $params['form']    = $form;
-        $params['schemas'] = ['MusicAlbum'=>'MusicAlbum'];
+
+        $c_opts = [
+            'meta' => [null, null, 'json']
+        ];
+
+        $combiner = new Combiner($id, $c_opts, 'music-album');
+        $album = $combiner->prepare($album);
 
         if(!($valid = $form->validate($album)) || !$form->csrfTest('noob'))
             return $this->resp('music/album/edit', $params);
 
-        Meta::combine($valid, 'meta');
+        $valid = $combiner->finalize($valid);
 
         if($id){
             if(!MAlbum::set((array)$valid, ['id'=>$id]))
@@ -99,7 +104,7 @@ class AlbumController extends \Admin\Controller
 
         $params             = $this->getParams('Music Album');
         $params['albums']   = $albums;
-        $params['form']     = new Form('admin-music-album.index');
+        $params['form']     = new Form('admin.music-album.index');
 
         $params['form']->validate( (object)$this->req->get() );
 
