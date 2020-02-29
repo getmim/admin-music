@@ -65,10 +65,12 @@ class AlbumController extends \Admin\Controller
         if($id){
             if(!MAlbum::set((array)$valid, ['id'=>$id]))
                 deb(MAlbum::lastError());
+            $this->event->trigger('music-album:updated', $album);
         }else{
             $valid->user = $this->user->id;
-            if(!MAlbum::create((array)$valid))
+            if(!($id = $valid->id = MAlbum::create((array)$valid)))
                 deb(MAlbum::lastError());
+            $this->event->trigger('music-album:created', $valid);
         }
 
         // add the log
@@ -151,6 +153,8 @@ class AlbumController extends \Admin\Controller
 
         MAlbum::remove(['id'=>$id]);
         Music::set(['album'=>0], ['album'=>$id]);
+
+        $this->event->trigger('music-album:deleted', $album);
 
         $this->res->redirect($next);
     }
