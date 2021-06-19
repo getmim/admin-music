@@ -2,7 +2,7 @@
 
 return [
     '__name' => 'admin-music',
-    '__version' => '0.0.3',
+    '__version' => '0.1.0',
     '__git' => 'git@github.com:getmim/admin-music.git',
     '__license' => 'MIT',
     '__author' => [
@@ -200,6 +200,13 @@ return [
                     'rules' => [
                         'required' => TRUE,
                         'upload' => 'std-audio'
+                    ]
+                ],
+                'youtube' => [
+                    'label' => 'Youtube URL',
+                    'type' => 'url',
+                    'rules' => [
+                        'url' => true
                     ]
                 ],
                 'content' => [
