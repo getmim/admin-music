@@ -280,7 +280,9 @@ return [
                     'type' => 'date',
                     'rules' => [
                         'required' => true,
-                        'date' => true
+                        'date' => [
+                            'format' => 'Y-m-d'
+                        ]
                     ]
                 ],
                 'meta-schema' => [
