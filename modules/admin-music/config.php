@@ -2,7 +2,7 @@
 
 return [
     '__name' => 'admin-music',
-    '__version' => '0.1.0',
+    '__version' => '0.1.1',
     '__git' => 'git@github.com:getmim/admin-music.git',
     '__license' => 'MIT',
     '__author' => [
@@ -278,7 +278,10 @@ return [
                 'release' => [
                     'label' => 'Release Date',
                     'type' => 'date',
-                    'rules' => []
+                    'rules' => [
+                        'required' => true,
+                        'date' => true
+                    ]
                 ],
                 'meta-schema' => [
                     'options' => [
